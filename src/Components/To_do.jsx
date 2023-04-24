@@ -19,7 +19,7 @@ export default function To_do() {
     if (data) addTodo([...data]);
   };
 
-  const dltTask = (index) => {};
+  // const dltTask = (index) => {};
 
   const deleteAll = () => {
     if (todo.length > 0) {
@@ -49,12 +49,12 @@ export default function To_do() {
         return (
           <>
             <div key={index}>
-              <div className="tasks">{ele} </div>
+              <div className="tasks">{ele}</div>
             </div>
           </>
         );
       })}
-
+      {/* try to commit */}
       <div onClick={deleteAll} className="delete-all">
         Delete all
       </div>
