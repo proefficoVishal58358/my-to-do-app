@@ -8,6 +8,8 @@ export default function To_do() {
 
   const [todo, addTodo] = useState(data);
   // const [dlt, setDlt] = useState([]);
+  // const [dlt, setDlt] = useState([]);
+  // const [dlt, setDlt] = useState([]);
 
   const addTask = () => {
     if (task !== "") {
