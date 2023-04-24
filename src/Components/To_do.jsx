@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
 export default function To_do() {
@@ -6,27 +6,34 @@ export default function To_do() {
 
   const [data, setData] = useState([]);
 
-  const [todo, addTodo] = useState(data);
-  // const [dlt, setDlt] = useState([]);
-  // const [dlt, setDlt] = useState([]);
-  // const [dlt, setDlt] = useState([]);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {}, []);
 
   const addTask = () => {
     if (task !== "") {
-      data.push(task);
-      setData([...data]);
+      // data.push(task);
+      setData([...data, task]);
+      setTask("");
     }
   };
-  const show = () => {
-    if (data) addTodo([...data]);
+  const showData = () => {
+    if (data.length > 0) {
+      setShow(!show);
+    }
   };
 
-  // const dltTask = (index) => {};
+  const deleteTask = (index) => {
+    let newData = [...data];
+    const filterdata = newData.filter((ele, index1) => index1 != index);
+    setData(filterdata);
+    filterdata.length === 0 && setShow(false);
+  };
 
   const deleteAll = () => {
-    if (todo.length > 0) {
-      addTodo([]);
+    if (data.length > 0) {
       setData([]);
+      setShow(false);
     }
   };
   return (
@@ -43,19 +50,31 @@ export default function To_do() {
         <button onClick={addTask} type="button" className="add">
           Add Task
         </button>
-        <button onClick={show} type="button" className="add">
-          Show Task
+        <button onClick={showData} type="button" className="add">
+          {show ? "Hide Task" : "Show Task"}
         </button>
       </div>
-      {todo?.map((ele, index) => {
-        return (
-          <>
-            <div key={index}>
-              <div className="tasks">{ele}</div>
-            </div>
-          </>
-        );
-      })}
+
+      {show &&
+        data?.map((ele, index) => {
+          return (
+            <>
+              <div key={index}>
+                <div className="tasks">
+                  {ele}
+                  <button
+                    className="add"
+                    onClick={() => {
+                      deleteTask(index);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </>
+          );
+        })}
       {/* try to commit */}
       <div onClick={deleteAll} className="delete-all">
         Delete all
