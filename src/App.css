@@ -74,41 +74,21 @@ body {
   margin-top: 20px;
   border-radius: 6px;
   padding: 20px;
-}
-.tasks .task {
-  background-color: white;
   padding: 10px;
   border-radius: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: 0.3s;
   cursor: pointer;
   border: 1px solid #ccc;
 }
-.tasks .task:not(:last-child) {
-  margin-bottom: 15px;
-}
-.tasks .task:hover {
-  background-color: #f7f7f7;
-}
-.tasks .task.done {
-  opacity: 0.5;
+
+.tasks > .done {
   position: relative;
-}
-.task.done::after {
-  position: absolute;
-  content: "";
-}
-.tasks .task span {
-  font-weight: bold;
-  font-size: 10px;
-  background-color: red;
   color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: green;
 }
+
 .delete-all {
   width: calc(100% - 25px);
   margin: auto;

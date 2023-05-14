@@ -7,6 +7,7 @@ export default function To_do() {
   const [data, setData] = useState([]);
 
   const [show, setShow] = useState(false);
+  const [complete, isComplete] = useState(false);
 
   useEffect(() => {}, []);
 
@@ -17,7 +18,7 @@ export default function To_do() {
       setTask("");
     }
   };
-  const showData = () => {
+  const showTask = () => {
     if (data.length > 0) {
       setShow(!show);
     }
@@ -36,6 +37,11 @@ export default function To_do() {
       setShow(false);
     }
   };
+  const completeTask = () => {
+    if (data.length > 0) {
+      isComplete(!complete);
+    }
+  };
   return (
     <div className="container">
       <div className="form">
@@ -50,7 +56,7 @@ export default function To_do() {
         <button onClick={addTask} type="button" className="add">
           Add Task
         </button>
-        <button onClick={showData} type="button" className="add">
+        <button onClick={showTask} type="button" className="add">
           {show ? "Hide Task" : "Show Task"}
         </button>
       </div>
@@ -70,6 +76,18 @@ export default function To_do() {
                   >
                     Delete
                   </button>
+                  <button
+                    className="add"
+                    onClick={() => {
+                      completeTask(index);
+                    }}
+                  >
+                    {complete ? "InComplete" : "Complete"}
+                    {}
+                  </button>
+                  <div className="done">
+                    {complete ? "InComplete" : "Complete"}
+                  </div>
                 </div>
               </div>
             </>
