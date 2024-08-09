@@ -1,10 +1,12 @@
 import "./App.css";
-import To_do from "./Components/To_do";
-
-function App() {
+import '@syncfusion/ej2-base/styles/material.css';
+import '@syncfusion/ej2-react-pdfviewer/styles/material.css';
+import PdfViewerWithDragDrop from "./Components/pdfViewerCanvas";
+  function App() {
   return (
     <div className="App">
-      <To_do></To_do>
+      {/* <To_do></To_do> */}
+      <PdfViewerWithDragDrop/>
     </div>
   );
 }

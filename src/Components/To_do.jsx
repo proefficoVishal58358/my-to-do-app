@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export default function To_do() {
   const [task, setTask] = useState("");
+  const [name, setName] = useState("");
 
   const [data, setData] = useState([]);
 
@@ -14,14 +15,17 @@ export default function To_do() {
   const addTask = () => {
     if (task !== "") {
       // data.push(task);
-      setData([...data, task]);
+      setData([...data, { task: task, name: name }]);
       setTask("");
+      setName("");
     }
+    console.log(data);
   };
   const showTask = () => {
     if (data.length > 0) {
       setShow(!show);
     }
+    console.log(data);
   };
 
   const deleteTask = (index) => {
@@ -53,6 +57,14 @@ export default function To_do() {
           value={task}
           required
         />
+        <input
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+          className="input"
+          placeholder="Enter your Name"
+          value={name}
+          required
+        />
         <button onClick={addTask} type="button" className="add">
           Add Task
         </button>
@@ -67,7 +79,7 @@ export default function To_do() {
             <>
               <div key={index}>
                 <div className="tasks">
-                  {ele}
+                  {ele.task}, {ele.name}
                   <button
                     className="add"
                     onClick={() => {
