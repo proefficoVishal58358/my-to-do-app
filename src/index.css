@@ -5,13 +5,27 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(90deg, #ec2c2c, #d29e62, #e9993d);
+  /* background: linear-gradient(90deg, #ec2c2c, #d29e62, #e9993d); */
   font-family: Poppins, sans-serif;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+.toolbar {
+  display: flex;
+  justify-content: flex-start;
+  background-color: #eee;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.toolbar button {
+  margin-right: 10px;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
 }
 @import '../node_modules/@syncfusion/ej2-base/styles/material.css';  
 @import '../node_modules/@syncfusion/ej2-buttons/styles/material.css';
