@@ -1,14 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
-import 'bootstrap/dist/css/bootstrap.css';
+import "bootstrap/dist/css/bootstrap.css";
 import Toolbar from "./canvasToolBar";
 
-
 const Canvas = (props) => {
-  const pagePdfIndex=props.pagesIndexes;
+  const pagePdfIndex = props.pagesIndexes;
   // console.log(props?.annotaionType,'annotaionType')
   // console.log(props?.annotationData,'annotationData')
-  // console.log(props?.annotaionText,'annotaionText')  
+  // console.log(props?.annotaionText,'annotaionText')
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -19,12 +18,13 @@ const Canvas = (props) => {
   const [clipboardColor, setClipboardColor] = useState("green");
   const [stickiNoteColor, setStickyNoteColor] = useState("white");
   const [textBoxColor, setTextBoxColor] = useState("pink");
-  const [textData,setTextData]=useState(null)
- 
+  const [textData, setTextData] = useState(null);
+
   useEffect(() => {
-    props?.annotaionText && addPdfTextToCanva(props?.annotaionText,props?.mappedId)
-  }, [props?.annotaionText&&props.mappedId])
-  
+    props?.annotaionText &&
+      addPdfTextToCanva(props?.annotaionText, props?.mappedId);
+  }, [props?.annotaionText]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     canvas.width = window.innerWidth * 2;
@@ -37,12 +37,12 @@ const Canvas = (props) => {
     context.strokeStyle = "black";
     context.lineWidth = 5;
     contextRef.current = context;
-    context.strokeStyle = '#ff0000'; // Stroke color
+    context.strokeStyle = "#ff0000"; // Stroke color
   }, []);
 
   useEffect(() => {
     if (contextRef.current) {
-      contextRef.current.strokeStyle  = selectedColor;
+      contextRef.current.strokeStyle = selectedColor;
     }
   }, [selectedColor]);
 
@@ -75,12 +75,12 @@ const Canvas = (props) => {
         y: 50,
         width: 200,
         height: 200,
-        color:"red"
+        color: "red",
       };
       setNotes([...notes, newNote]);
     }
   };
-  const addPdfTextToCanva = (text,mappedId) => {
+  const addPdfTextToCanva = (text, mappedId) => {
     if (text !== null && text.trim() !== "") {
       const newNotePdfExtracting = {
         id: pdfHighLightedText.length + 1,
@@ -90,32 +90,52 @@ const Canvas = (props) => {
         y: 50,
         width: 200,
         height: 200,
-        color:textBoxColor
+        color: textBoxColor,
       };
       setPdFHighLightedText([...pdfHighLightedText, newNotePdfExtracting]);
     }
   };
-  const handleDragChange = (type,id, text) => {
-    if(type=="note"){
-      setNotes(notes.map((note) => (note.id === id ? { ...note, text } : note)));
-    }else{
-      setPdFHighLightedText(pdfHighLightedText.map((text)=>(text.id === id ? { ...text, text } : text)))
+  const handleDragChange = (type, id, text) => {
+    if (type == "note") {
+      setNotes(
+        notes.map((note) => (note.id === id ? { ...note, text } : note))
+      );
+    } else {
+      setPdFHighLightedText(
+        pdfHighLightedText.map((text) =>
+          text.id === id ? { ...text, text } : text
+        )
+      );
     }
   };
 
   const handleDragStop = (type, id, x, y) => {
-    if(type=="note"){
-    setNotes(notes.map((note) => (note.id === id ? { ...note, x, y } : note)));
-    }else{
-      setPdFHighLightedText(pdfHighLightedText.map((text)=>(text.id === id ? { ...text, x, y } : text)))
+    if (type == "note") {
+      setNotes(
+        notes.map((note) => (note.id === id ? { ...note, x, y } : note))
+      );
+    } else {
+      setPdFHighLightedText(
+        pdfHighLightedText.map((text) =>
+          text.id === id ? { ...text, x, y } : text
+        )
+      );
     }
   };
 
-  const handleResizeStop = (type,id, width, height) => {
-    if(type=="note"){
-    setNotes(notes.map((note) => (note.id === id ? { ...note, width, height } : note)));
-    }else{
-      setPdFHighLightedText(pdfHighLightedText.map((text)=>(text.id === id ? { ...text, width, height  } : text)))
+  const handleResizeStop = (type, id, width, height) => {
+    if (type == "note") {
+      setNotes(
+        notes.map((note) =>
+          note.id === id ? { ...note, width, height } : note
+        )
+      );
+    } else {
+      setPdFHighLightedText(
+        pdfHighLightedText.map((text) =>
+          text.id === id ? { ...text, width, height } : text
+        )
+      );
     }
   };
 
@@ -127,7 +147,7 @@ const Canvas = (props) => {
       y: 100,
       width: 200,
       height: 100,
-      color:"violet"
+      color: "violet",
     };
     setTextboxes([...textboxes, newTextbox]);
   };
@@ -163,26 +183,27 @@ const Canvas = (props) => {
     const canvas = canvasRef.current;
     const context = contextRef.current;
     context.clearRect(0, 0, canvas.width, canvas.height);
-    props.setMappedId('');
+    props.setMappedId("");
     props.setAnnoDict([]);
-    props.viewerIns.annotation.setAnnotationMode('None');
+    props.viewerIns.annotation.setAnnotationMode("None");
   };
 
-  const goToAnnoPageLinkage = (e,linkingId) => {
+  const goToAnnoPageLinkage = (e, linkingId) => {
     e.stopPropagation();
     if (linkingId) {
-      const pageNumberArr= props?.annoDict?.filter(ele=>linkingId==ele.pageLinkedId);
-        if(pageNumberArr){
-          props.viewerIns.navigation.goToPage(pageNumberArr[0].pageIndex+1)
-        }
+      const pageNumberArr = props?.annoDict?.filter(
+        (ele) => linkingId == ele.pageLinkedId
+      );
+      if (pageNumberArr) {
+        props.viewerIns.navigation.goToPage(pageNumberArr[0].pageIndex + 1);
+      }
     } else {
-      props.viewerIns.annotationModule.selectAnnotation(props.mappedId)
+      props.viewerIns.annotationModule.selectAnnotation(props.mappedId);
     }
-}
-
+  };
 
   return (
-    <div style={{ width: "40%", height: "100%", background: "azure"}}>
+    <div style={{ width: "40%", height: "100%", background: "azure" }}>
       <Toolbar
         onAddStickyNote={addStickyNote}
         onAddTextBox={addTextBox}
@@ -197,16 +218,21 @@ const Canvas = (props) => {
           onMouseUp={finishDrawing}
           onMouseMove={draw}
           onMouseLeave={finishDrawing}
-          style={{zIndex: 1 }}      
+          style={{ zIndex: 1 }}
         />
         {notes.map((note, index) => (
           <Rnd
             key={note.id}
             size={{ width: note.width, height: note.height }}
             position={{ x: note.x + index * 20, y: note.y + index * 20 }}
-            onDragStop={(e, d) => handleDragStop('note',note.id, d.x, d.y)}
+            onDragStop={(e, d) => handleDragStop("note", note.id, d.x, d.y)}
             onResizeStop={(e, direction, ref, delta, position) => {
-              handleResizeStop('note',note.id, ref.offsetWidth, ref.offsetHeight);
+              handleResizeStop(
+                "note",
+                note.id,
+                ref.offsetWidth,
+                ref.offsetHeight
+              );
             }}
             style={{
               zIndex: 2,
@@ -214,7 +240,11 @@ const Canvas = (props) => {
               cursor: "move",
             }}
           >
-            <div className="card card-body shadow"  onChange={(e) => handleDragChange('note',note.id, e.target.value)}
+            <div
+              className="card card-body shadow"
+              onChange={(e) =>
+                handleDragChange("note", note.id, e.target.value)
+              }
               style={{
                 width: "100%",
                 height: "100%",
@@ -222,7 +252,8 @@ const Canvas = (props) => {
                 border: "none",
                 resize: "none",
                 outline: "none",
-              }}>
+              }}
+            >
               {note.text}
             </div>
           </Rnd>
@@ -230,20 +261,69 @@ const Canvas = (props) => {
         {pdfHighLightedText.map((pdfHighLightedText, index) => (
           <Rnd
             key={pdfHighLightedText.id}
-            size={{ width: pdfHighLightedText.width, height: pdfHighLightedText.height }}
-            position={{ x: pdfHighLightedText.x + index * 20, y: pdfHighLightedText.y + index * 20 }}
-            onDragStop={(e, d) => handleDragStop('pdfExtractedText',pdfHighLightedText.id, d.x, d.y)}
-            onResizeStop={(e, direction, ref, delta, position) => {
-              handleResizeStop('pdfExtractedText',pdfHighLightedText.id, ref.offsetWidth, ref.offsetHeight);
+            size={{
+              width: pdfHighLightedText.width,
+              height: pdfHighLightedText.height,
             }}
-            
+            position={{
+              x: pdfHighLightedText.x + index * 20,
+              y: pdfHighLightedText.y + index * 20,
+            }}
+            onDragStop={(e, d) =>
+              handleDragStop(
+                "pdfExtractedText",
+                pdfHighLightedText.id,
+                d.x,
+                d.y
+              )
+            }
+            onResizeStop={(e, direction, ref, delta, position) => {
+              handleResizeStop(
+                "pdfExtractedText",
+                pdfHighLightedText.id,
+                ref.offsetWidth,
+                ref.offsetHeight
+              );
+            }}
             style={{
               zIndex: 2,
               backgroundColor: "",
               cursor: "move",
             }}
-          > 
-            <div className="card card-body shadow postion-relative rounded-3" onChange={(e) => handleDragChange('pdfExtractedText',pdfHighLightedText.id, e.target.value)}
+          >
+            <div className="input-group">
+              <em
+                className=" text-primary input-group-text "
+                onClick={(e) =>
+                  goToAnnoPageLinkage(e, pdfHighLightedText.linkingId)
+                }
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  cursor={"pointer"}
+                  class="bi bi-arrow-left-circle-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+              </em>
+              <input
+                className="form-control form-control-sm text-white font-weight-bold text-capitalize"
+                style={{ background: " rgb(254,166,154)" }}
+              />
+            </div>
+            <div
+              className="card card-body shadow  rounded-3"
+              onChange={(e) =>
+                handleDragChange(
+                  "pdfExtractedText",
+                  pdfHighLightedText.id,
+                  e.target.value
+                )
+              }
               style={{
                 width: "100%",
                 height: "80%",
@@ -251,17 +331,14 @@ const Canvas = (props) => {
                 border: "none",
                 resize: "none",
                 outline: "none",
-                overflow:"scroll"
-              }}>
-                <em style={{position:"absolute",left:"1%",bottom:"90%"}} onClick={(e)=>goToAnnoPageLinkage(e,pdfHighLightedText.linkingId)} className="text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
-                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
-              </svg></em>
-                <input className="form-control form-control-sm text-white" style={{background:" rgb(254,166,154)"}}/>
+                overflow: "hidden",
+              }}
+            >
               {pdfHighLightedText.text}
             </div>
           </Rnd>
         ))}
-        {textboxes.map((textbox,index) => (
+        {textboxes.map((textbox, index) => (
           <Rnd
             key={textbox.id}
             size={{ width: textbox.width, height: textbox.height }}
