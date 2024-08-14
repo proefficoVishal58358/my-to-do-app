@@ -3,10 +3,12 @@ import { Rnd } from "react-rnd";
 import 'bootstrap/dist/css/bootstrap.css';
 import Toolbar from "./canvasToolBar";
 
+
 const Canvas = (props) => {
-  console.log(props?.annotaionType,'annotaionType')
-  console.log(props?.annotationData,'annotationData')
-  console.log(props?.annotaionText,'annotaionText')  
+  const pagePdfIndex=props.pagesIndexes;
+  // console.log(props?.annotaionType,'annotaionType')
+  // console.log(props?.annotationData,'annotationData')
+  // console.log(props?.annotaionText,'annotaionText')  
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -17,10 +19,11 @@ const Canvas = (props) => {
   const [clipboardColor, setClipboardColor] = useState("green");
   const [stickiNoteColor, setStickyNoteColor] = useState("white");
   const [textBoxColor, setTextBoxColor] = useState("pink");
-
+  const [textData,setTextData]=useState(null)
+ 
   useEffect(() => {
-    props?.annotaionText && addPdfTextToCanva(props?.annotaionText)
-  }, [props?.annotaionText])
+    props?.annotaionText && addPdfTextToCanva(props?.annotaionText,props?.mappedId)
+  }, [props?.annotaionText&&props.mappedId])
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -39,7 +42,7 @@ const Canvas = (props) => {
 
   useEffect(() => {
     if (contextRef.current) {
-      contextRef.current.strokeStyle = selectedColor;
+      contextRef.current.strokeStyle  = selectedColor;
     }
   }, [selectedColor]);
 
@@ -77,10 +80,11 @@ const Canvas = (props) => {
       setNotes([...notes, newNote]);
     }
   };
-  const addPdfTextToCanva = (text) => {
+  const addPdfTextToCanva = (text,mappedId) => {
     if (text !== null && text.trim() !== "") {
       const newNotePdfExtracting = {
         id: pdfHighLightedText.length + 1,
+        linkingId: mappedId,
         text,
         x: 50,
         y: 50,
@@ -91,8 +95,7 @@ const Canvas = (props) => {
       setPdFHighLightedText([...pdfHighLightedText, newNotePdfExtracting]);
     }
   };
-
-  const handleChange = (type,id, text) => {
+  const handleDragChange = (type,id, text) => {
     if(type=="note"){
       setNotes(notes.map((note) => (note.id === id ? { ...note, text } : note)));
     }else{
@@ -160,10 +163,26 @@ const Canvas = (props) => {
     const canvas = canvasRef.current;
     const context = contextRef.current;
     context.clearRect(0, 0, canvas.width, canvas.height);
+    props.setMappedId('');
+    props.setAnnoDict([]);
+    props.viewerIns.annotation.setAnnotationMode('None');
   };
 
+  const goToAnnoPageLinkage = (e,linkingId) => {
+    e.stopPropagation();
+    if (linkingId) {
+      const pageNumberArr= props?.annoDict?.filter(ele=>linkingId==ele.pageLinkedId);
+        if(pageNumberArr){
+          props.viewerIns.navigation.goToPage(pageNumberArr[0].pageIndex+1)
+        }
+    } else {
+      props.viewerIns.annotationModule.selectAnnotation(props.mappedId)
+    }
+}
+
+
   return (
-    <div style={{ width: "40%", height: "100%" }}>
+    <div style={{ width: "40%", height: "100%", background: "azure"}}>
       <Toolbar
         onAddStickyNote={addStickyNote}
         onAddTextBox={addTextBox}
@@ -178,7 +197,7 @@ const Canvas = (props) => {
           onMouseUp={finishDrawing}
           onMouseMove={draw}
           onMouseLeave={finishDrawing}
-          style={{zIndex: 1 }}
+          style={{zIndex: 1 }}      
         />
         {notes.map((note, index) => (
           <Rnd
@@ -195,7 +214,7 @@ const Canvas = (props) => {
               cursor: "move",
             }}
           >
-            <div className="card card-body shadow"  onChange={(e) => handleChange('note',note.id, e.target.value)}
+            <div className="card card-body shadow"  onChange={(e) => handleDragChange('note',note.id, e.target.value)}
               style={{
                 width: "100%",
                 height: "100%",
@@ -217,21 +236,27 @@ const Canvas = (props) => {
             onResizeStop={(e, direction, ref, delta, position) => {
               handleResizeStop('pdfExtractedText',pdfHighLightedText.id, ref.offsetWidth, ref.offsetHeight);
             }}
+            
             style={{
               zIndex: 2,
-              backgroundColor: selectedColor,
+              backgroundColor: "",
               cursor: "move",
             }}
-          >
-            <div className="card card-body shadow"  onChange={(e) => handleChange('pdfExtractedText',pdfHighLightedText.id, e.target.value)}
+          > 
+            <div className="card card-body shadow postion-relative rounded-3" onChange={(e) => handleDragChange('pdfExtractedText',pdfHighLightedText.id, e.target.value)}
               style={{
                 width: "100%",
-                height: "100%",
-                backgroundColor: pdfHighLightedText.color,
+                height: "80%",
+                backgroundColor: "#white",
                 border: "none",
                 resize: "none",
                 outline: "none",
+                overflow:"scroll"
               }}>
+                <em style={{position:"absolute",left:"1%",bottom:"90%"}} onClick={(e)=>goToAnnoPageLinkage(e,pdfHighLightedText.linkingId)} className="text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+              </svg></em>
+                <input className="form-control form-control-sm text-white" style={{background:" rgb(254,166,154)"}}/>
               {pdfHighLightedText.text}
             </div>
           </Rnd>
