@@ -24,6 +24,10 @@ const Canvas = (props) => {
     props?.annotaionText &&
       addPdfTextToCanva(props?.annotaionText, props?.mappedId);
   }, [props?.annotaionText]);
+  // useEffect(() => {
+  //   props?.droppedText &&
+  //     addPdfTextToCanva(props?.droppedText);
+  // }, [props?.droppedText]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -185,7 +189,6 @@ const Canvas = (props) => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     props.setMappedId("");
     props.setAnnoDict([]);
-    props.viewerIns.annotation.setAnnotationMode("None");
   };
 
   const goToAnnoPageLinkage = (e, linkingId) => {
@@ -219,6 +222,8 @@ const Canvas = (props) => {
           onMouseMove={draw}
           onMouseLeave={finishDrawing}
           style={{ zIndex: 1 }}
+          // onDropCapture={props.canvasOnDrop}
+          // onDragOver={props.onDragOver}
         />
         {notes.map((note, index) => (
           <Rnd
@@ -304,7 +309,7 @@ const Canvas = (props) => {
                   height="20"
                   fill="currentColor"
                   cursor={"pointer"}
-                  class="bi bi-arrow-left-circle-fill"
+                  className="bi bi-arrow-left-circle-fill"
                   viewBox="0 0 16 16"
                 >
                   <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
