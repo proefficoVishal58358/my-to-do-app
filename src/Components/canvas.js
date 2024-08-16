@@ -206,7 +206,7 @@ const Canvas = (props) => {
   };
 
   return (
-    <div style={{ width: "40%", height: "100%", background: "azure" }}>
+    <div style={{ width: "40%",  background: "azure" }}>
       <Toolbar
         onAddStickyNote={addStickyNote}
         onAddTextBox={addTextBox}
@@ -214,7 +214,7 @@ const Canvas = (props) => {
         selectedColor={selectedColor}
         setSelectedColor={setSelectedColor}
       />
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative",overflow:"scroll" }}>
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
@@ -228,22 +228,13 @@ const Canvas = (props) => {
         {notes.map((note, index) => (
           <Rnd
             key={note.id}
-            size={{ width: note.width, height: note.height }}
-            position={{ x: note.x + index * 20, y: note.y + index * 20 }}
+            size={{ width: note.width, height: note.height ,margin:"auto"}}
+            position={{ x: note.x, y: note.y}}
             onDragStop={(e, d) => handleDragStop("note", note.id, d.x, d.y)}
             onResizeStop={(e, direction, ref, delta, position) => {
-              handleResizeStop(
-                "note",
-                note.id,
-                ref.offsetWidth,
-                ref.offsetHeight
-              );
+              handleResizeStop("note",note.id,ref.offsetWidth,ref.offsetHeight);
             }}
-            style={{
-              zIndex: 2,
-              backgroundColor: selectedColor,
-              cursor: "move",
-            }}
+            style={{zIndex: 2,backgroundColor: selectedColor,cursor: "move",}}
           >
             <div
               className="card card-body shadow"
@@ -266,79 +257,35 @@ const Canvas = (props) => {
         {pdfHighLightedText.map((pdfHighLightedText, index) => (
           <Rnd
             key={pdfHighLightedText.id}
-            size={{
-              width: pdfHighLightedText.width,
-              height: pdfHighLightedText.height,
-            }}
-            position={{
-              x: pdfHighLightedText.x + index * 20,
-              y: pdfHighLightedText.y + index * 20,
-            }}
+            size={{width: pdfHighLightedText.width,height: pdfHighLightedText.height,  marginTop:"5px"}}
+            position={{x: pdfHighLightedText.x,y: pdfHighLightedText.y,}}
             onDragStop={(e, d) =>
-              handleDragStop(
-                "pdfExtractedText",
-                pdfHighLightedText.id,
-                d.x,
-                d.y
-              )
-            }
+              handleDragStop("pdfExtractedText",pdfHighLightedText.id,d.x,d.y)}
             onResizeStop={(e, direction, ref, delta, position) => {
-              handleResizeStop(
-                "pdfExtractedText",
-                pdfHighLightedText.id,
-                ref.offsetWidth,
-                ref.offsetHeight
-              );
+              handleResizeStop("pdfExtractedText",pdfHighLightedText.id,ref.offsetWidth,ref.offsetHeight);
             }}
             style={{
               zIndex: 2,
               backgroundColor: "",
               cursor: "move",
             }}
-          >
+          > 
             <div className="input-group">
               <em
-                className=" text-primary input-group-text "
+                className="text-primary input-group-text "
                 onClick={(e) =>
                   goToAnnoPageLinkage(e, pdfHighLightedText.linkingId)
                 }
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                  cursor={"pointer"}
-                  className="bi bi-arrow-left-circle-fill"
-                  viewBox="0 0 16 16"
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"} className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16"
                 >
                   <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                 </svg>
               </em>
-              <input
-                className="form-control form-control-sm text-white font-weight-bold text-capitalize"
-                style={{ background: " rgb(254,166,154)" }}
-              />
+              <input  className="form-control form-control-sm text-white font-weight-bold text-capitalize" style={{ background: " rgb(254,166,154)" }}/>
             </div>
-            <div
-              className="card card-body shadow  rounded-3"
-              onChange={(e) =>
-                handleDragChange(
-                  "pdfExtractedText",
-                  pdfHighLightedText.id,
-                  e.target.value
-                )
-              }
-              style={{
-                width: "100%",
-                height: "80%",
-                backgroundColor: "#white",
-                border: "none",
-                resize: "none",
-                outline: "none",
-                overflow: "hidden",
-              }}
-            >
+          <div className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{width: "100%", height: "80%", backgroundColor: "#white", border: "none", resize: "none", outline: "none", overflow: "hidden",}}>
+         
               {pdfHighLightedText.text}
             </div>
           </Rnd>
@@ -346,8 +293,8 @@ const Canvas = (props) => {
         {textboxes.map((textbox, index) => (
           <Rnd
             key={textbox.id}
-            size={{ width: textbox.width, height: textbox.height }}
-            position={{ x: textbox.x + index * 20, y: textbox.y + index * 20 }}
+            size={{ width: textbox.width, height: textbox.height ,margin:"auto" }}
+            position={{ x: textbox.x , y: textbox.y  }}
             onDragStop={(e, d) => handleTextboxDragStop(textbox.id, d.x, d.y)}
             onResizeStop={(e, direction, ref, delta, position) => {
               handleTextboxResizeStop(
@@ -363,18 +310,21 @@ const Canvas = (props) => {
               // backgroundColor: textbox.color,
             }}
           >
-            <textarea
+            <div className="card card-body rounded-3">
+            <textarea placeholder="Write something here..."
               value={textbox.text}
               onChange={(e) => handleTextboxChange(textbox.id, e.target.value)}
               style={{
                 width: "100%",
                 height: "100%",
-                backgroundColor: textbox.color,
+                backgroundColor: "white",
                 border: "none",
                 resize: "none",
                 outline: "none",
+                color:"black"
               }}
             />
+            </div>
           </Rnd>
         ))}
       </div>

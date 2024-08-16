@@ -74,18 +74,7 @@ const handleAnnotationRemove = async (args: any) => {
     }
 }, []); 
 
-useEffect(() => {
-    if (viewerIns) {
-        console.log('Viewer instance is set:', viewerIns);
-    }
-}, [viewerIns]);
 
-const addLink = (id: string, mappedId: string) => {
-  setLinkMap(prevLinkMap => ({
-      ...prevLinkMap,
-      [id]: mappedId
-  }));
-};
   return (
     <div>
       <div style={{ display: "flex" ,overflowX:"hidden"}}>

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
     "@syncfusion/ej2-react-base": "^26.2.5",
     "@syncfusion/ej2-react-pdfviewer": "^26.2.8",
     "@testing-library/jest-dom": "^5.16.5",
