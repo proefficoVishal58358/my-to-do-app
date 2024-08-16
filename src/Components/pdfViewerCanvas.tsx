@@ -22,7 +22,7 @@ import {
   AnnotationSelectorSettingsModel
 } from "@syncfusion/ej2-react-pdfviewer";
 import Canvas from "./canvas";
-const PdfViewerWithDragDrop = () => {
+const PdfViewerComp = () => {
   interface LinkMap {[key: string]: string;}
   const pdfViewerRef = useRef(null);
   const [annotationData, setAnnotationData] = useState(null);
@@ -55,16 +55,13 @@ const PdfViewerWithDragDrop = () => {
     if (args.annotationType!='Ink'){
       viewerIns.annotation.setAnnotationMode("None")
     }
-    
-    // addAnnotation(args, annoDict, setAnnoDict)
-  }
+      }
   console.log('annote dictionary',annoDict)
 
 const handleAnnotationRemove = async (args: any) => {
   setAnnotId('')
   setLinkB('')
   setLinkA('')
-  // removeAnnotation(args.annotationId, annoDict, setAnnoDict, linkMap, setLinkMap)
 }
 
   useEffect(() => {
@@ -83,30 +80,12 @@ useEffect(() => {
     }
 }, [viewerIns]);
 
-
-// const getMappedId = (id: string) => {
-//   return annoDict[linkMap[id]] || null;
-// };
-
 const addLink = (id: string, mappedId: string) => {
   setLinkMap(prevLinkMap => ({
       ...prevLinkMap,
       [id]: mappedId
   }));
 };
-const handleConfirm = () => {
-  if (linkA.annotationId !== linkB.annotationId) {
-      addLink(linkA.annotationId, linkB.annotationId);
-      addLink(linkB.annotationId, linkA.annotationId);
-      //setAnnotId(linkB)
-      //viewerIns.annotation.selectAnnotation(linkB.annotationId)
-  }
-  setLinkA('');
-  setLinkB('');
-};
-
-
-
   return (
     <div>
       <div style={{ display: "flex" ,overflowX:"hidden"}}>
@@ -156,4 +135,4 @@ const handleConfirm = () => {
   );
 };
 
-export default PdfViewerWithDragDrop;
+export default PdfViewerComp;

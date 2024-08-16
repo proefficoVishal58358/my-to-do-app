@@ -22,7 +22,7 @@ import {
   AnnotationSelectorSettingsModel
 } from "@syncfusion/ej2-react-pdfviewer";
 import Canvas from "./canvas";
-const PdfViewerWithDragDrop = () => {
+const PdfViewerWithDragDropDiv = () => {
   const [selectedText, setSelectedText] = useState<string>("");
   const [dragging, setDragging] = useState<boolean>(false);
   const [droppedText, setDroppedText] = useState("");
@@ -115,7 +115,6 @@ const handleTextSelectionEnd = (args : any) => {
   setSelectedText(text);
     if (text) {
       setDragging(true);
-      args.annotation.setAnnotationMode("Highlight");
     }
 };
 const handleDragStart = (event) => {
@@ -260,4 +259,4 @@ const handleDrop = (event:any) => {
   );
 };
 
-export default PdfViewerWithDragDrop;
+export default  PdfViewerWithDragDropDiv ;
