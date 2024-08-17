@@ -17,7 +17,7 @@ const Toolbar = ({ onAddStickyNote, onAddTextBox, onClearAll, selectedColor, set
   
     navigator.clipboard.readText()
       .then(text => {
-        setClipBoardTextItems(prev => {
+        setClipBoardTextItems(prev => { 
           const newItems = [...prev, text];
           console.log('Updated clipboard items:', newItems);
           return newItems;
