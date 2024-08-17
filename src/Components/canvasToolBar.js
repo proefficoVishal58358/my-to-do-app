@@ -10,7 +10,7 @@ const Toolbar = ({ onAddStickyNote, onAddTextBox, onClearAll, selectedColor, set
 
   const toggleCollapse = () => {
     setIsCollapsed(prev => !prev);
-  };
+  }; 
 
   const handleOpenClipBoard = () => {
     setclipBoardFlag(true);
