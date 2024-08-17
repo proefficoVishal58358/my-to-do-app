@@ -27,6 +27,28 @@ code {
   font-size: 16px;
   cursor: pointer;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.clipboard-container {
+  opacity: 0; 
+  transform: translateY(-20px); 
+  animation: none; 
+  transition: opacity 0.5s ease, transform 0.3s ease;
+}
+.clipboard-container.visible {
+  animation: fadeIn 0.8s forwards; 
+  opacity: 1; 
+  transform: translateY(0); 
+}
 @import '../node_modules/@syncfusion/ej2-base/styles/material.css';  
 @import '../node_modules/@syncfusion/ej2-buttons/styles/material.css';
 @import '../node_modules/@syncfusion/ej2-dropdowns/styles/material.css';  

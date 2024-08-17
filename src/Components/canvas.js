@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
 import "bootstrap/dist/css/bootstrap.css";
 import Toolbar from "./canvasToolBar";
+import MinMaxBtnCanva from "./MinMaxBtnCanva";
 
 const Canvas = (props) => {
   const pagePdfIndex = props.pagesIndexes;
@@ -19,6 +20,7 @@ const Canvas = (props) => {
   const [stickiNoteColor, setStickyNoteColor] = useState("white");
   const [textBoxColor, setTextBoxColor] = useState("pink");
   const [textData, setTextData] = useState(null);
+  const [minMaxCanvaWidth, setMinMaxCanvaWidth] = useState("40%");
 
   useEffect(() => {
     props?.annotaionText &&
@@ -205,8 +207,20 @@ const Canvas = (props) => {
     }
   };
 
+  const maxCanvaWidthFunc =()=>{
+    setMinMaxCanvaWidth("100%");
+  }
+
+  const minCanvaWidthFunc =()=>{
+    setMinMaxCanvaWidth("40%");
+  }
+
   return (
-    <div style={{ width: "40%",  background: "azure" }}>
+    <div style={{ width: `${minMaxCanvaWidth}`,  background: "azure" }}>
+      <MinMaxBtnCanva 
+      maxCanvaWidthFunc={maxCanvaWidthFunc}
+      minCanvaWidthFunc={minCanvaWidthFunc}
+      />
       <Toolbar
         onAddStickyNote={addStickyNote}
         onAddTextBox={addTextBox}
@@ -214,7 +228,7 @@ const Canvas = (props) => {
         selectedColor={selectedColor}
         setSelectedColor={setSelectedColor}
       />
-      <div style={{ position: "relative",overflow:"scroll" }}>
+      <div style={{ position: "relative",overflowX:"scroll" }}>
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
@@ -257,11 +271,11 @@ const Canvas = (props) => {
         {pdfHighLightedText.map((pdfHighLightedText, index) => (
           <Rnd
             key={pdfHighLightedText.id}
-            size={{width: pdfHighLightedText.width,height: pdfHighLightedText.height,  marginTop:"5px"}}
-            position={{x: pdfHighLightedText.x,y: pdfHighLightedText.y,}}
+            size={{width: pdfHighLightedText.width,height: pdfHighLightedText.height}}
+            position={{x: pdfHighLightedText.x, y: pdfHighLightedText.y}}
             onDragStop={(e, d) =>
               handleDragStop("pdfExtractedText",pdfHighLightedText.id,d.x,d.y)}
-            onResizeStop={(e, direction, ref, delta, position) => {
+              onResizeStop={(e, direction, ref, delta, position) => {
               handleResizeStop("pdfExtractedText",pdfHighLightedText.id,ref.offsetWidth,ref.offsetHeight);
             }}
             style={{
@@ -271,21 +285,14 @@ const Canvas = (props) => {
             }}
           > 
             <div className="input-group">
-              <em
-                className="text-primary input-group-text "
-                onClick={(e) =>
-                  goToAnnoPageLinkage(e, pdfHighLightedText.linkingId)
-                }
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"} className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16"
-                >
+              <em className="text-primary input-group-text " onClick={(e) =>goToAnnoPageLinkage(e, pdfHighLightedText.linkingId)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"} className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                   <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                 </svg>
               </em>
               <input  className="form-control form-control-sm text-white font-weight-bold text-capitalize" style={{ background: " rgb(254,166,154)" }}/>
             </div>
-          <div className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{width: "100%", height: "80%", backgroundColor: "#white", border: "none", resize: "none", outline: "none", overflow: "hidden",}}>
-         
+            <div className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{width: "100%", height: "80%", backgroundColor: "#white", border: "none", resize: "none", outline: "none", overflow: "hidden",}}>
               {pdfHighLightedText.text}
             </div>
           </Rnd>
@@ -293,7 +300,7 @@ const Canvas = (props) => {
         {textboxes.map((textbox, index) => (
           <Rnd
             key={textbox.id}
-            size={{ width: textbox.width, height: textbox.height ,margin:"auto" }}
+            size={{ width: textbox.width, height: textbox.height}}
             position={{ x: textbox.x , y: textbox.y  }}
             onDragStop={(e, d) => handleTextboxDragStop(textbox.id, d.x, d.y)}
             onResizeStop={(e, direction, ref, delta, position) => {

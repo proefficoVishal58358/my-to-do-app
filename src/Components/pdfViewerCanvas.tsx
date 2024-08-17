@@ -74,7 +74,6 @@ const handleAnnotationRemove = async (args: any) => {
     }
 }, []); 
 
-
   return (
     <div>
       <div style={{ display: "flex" ,overflowX:"hidden"}}>
@@ -105,6 +104,7 @@ const handleAnnotationRemove = async (args: any) => {
             ]}
           />
         </PdfViewerComponent>
+        
         <Canvas
           pdfViewerRef={pdfViewerRef}
           annotaionType={annotaionType}
