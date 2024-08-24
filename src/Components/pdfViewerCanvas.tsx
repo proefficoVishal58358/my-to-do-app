@@ -1,4 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
+import Split from 'react-split';
+
 import {
   PdfViewerComponent,
   Inject,
@@ -37,6 +39,7 @@ const PdfViewerComp = () => {
   const [linkB, setLinkB] = useState<any>('');
   const [mappedId, setMappedId] = useState<any>('');
   const [rightLinkMappedId, setRightLinkMappedId] = useState<any>('');
+  const[sizeCursor,setSizeCursor]=useState('ew-resize');
   let viewer: PdfViewerComponent | null = null;
   const handleAnnotationAdd = async (args: any) => {
     console.log('args',args)
@@ -50,6 +53,7 @@ const PdfViewerComp = () => {
       setMappedId(args.annotationId);
       setAnnoDict((prev)=> [...prev,{ extrPageIndex: argsPageIndex, pageLinkedId: args.annotationId}]);
     }else{
+      console.log(mappedId,'mappedId')
       setRightLinkMappedId(args.annotationId);
       setAnnoDict(prevState =>
         prevState.map(ele =>
@@ -84,13 +88,22 @@ const PdfViewerComp = () => {
 }, []); 
 
   return (
-    <div>
-      <div style={{ display: "flex" ,overflowX:"hidden"}}>
+    <Split
+    sizes={[60, 40]}
+    minSize={[400, 300]}
+    expandToMin={false}
+    gutterSize={10}
+    gutterAlign="center"
+    snapOffset={30}
+    dragInterval={1}
+    direction="horizontal"
+    cursor={sizeCursor}
+    style={{ height: "100%", width: "100%", display:"flex", overflowX:"hidden" }}
+  >
         <PdfViewerComponent
           id="container"
           documentPath="http://localhost:3000/Mr. Deepak and another Vs. Smt. Jagwati and others9dc2b3 (3).pdf"
           resourceUrl="https://cdn.syncfusion.com/ej2/24.1.41/dist/ej2-pdfviewer-lib"
-          style={{ height: "auto", width: "60%" }}
           ref={pdfViewerRef}
           enableTextSearch={true}
           annotationAdd={handleAnnotationAdd}
@@ -129,8 +142,7 @@ const PdfViewerComp = () => {
           annoDict={annoDict}
           setAnnoDict={setAnnoDict}
         />
-      </div>
-    </div>
+    </Split>
   );
 };
 

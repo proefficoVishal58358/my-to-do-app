@@ -30,7 +30,7 @@ const Canvas = (props) => {
   };
   const handleConfirm = () => {
     props.setMappedId(linkCardTextMapId);
-    let viewer = props.viewerIns.ej2_instances[0];
+    let viewer = props.viewerIns;
     viewer.annotation.setAnnotationMode('Ink');
 
   };
@@ -247,6 +247,7 @@ const Canvas = (props) => {
         props.viewerIns.navigation.goToPage(pageNumberArr[0].rightLinkpageIndex + 1);
       }
     } else {
+      console.log('pdfExtractedMappedId',pdfExtractedMappedId)
       handleShowModal(pdfExtractedMappedId)
     }
    
@@ -261,11 +262,11 @@ const Canvas = (props) => {
   }
 
   return (
-    <div style={{ width: `${minMaxCanvaWidth}`,  background: "azure" }}>
-      <MinMaxBtnCanva 
+    <div style={{background: "azure" }}>
+      {/* <MinMaxBtnCanva 
       maxCanvaWidthFunc={maxCanvaWidthFunc}
       minCanvaWidthFunc={minCanvaWidthFunc}
-      />
+      /> */}
       <Toolbar
         onAddStickyNote={addStickyNote}
         onAddTextBox={addTextBox}
@@ -362,18 +363,15 @@ const Canvas = (props) => {
             }}
             style={{
               zIndex: 2,
-              padding: "10px",
               cursor: "move",
               // backgroundColor: textbox.color,
             }}
           >
-            <div className="card card-body rounded-3 p-1" style={{height:"80%",width:"100%"}}>
+            <div className="card card-body rounded-3 p-1" style={{height:"100%",width:"100%"}}>
             <textarea placeholder="Write something here..."
               value={textbox.text}
               onChange={(e) => handleTextboxChange(textbox.id, e.target.value)}
               style={{
-                width: "100%",
-                height: "100%",
                 backgroundColor: "#fff",
                 border: "none",
                 resize: "none",
