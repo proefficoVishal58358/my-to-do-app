@@ -3,12 +3,10 @@ import { Rnd } from "react-rnd";
 import "bootstrap/dist/css/bootstrap.css";
 import Toolbar from "./canvasToolBar";
 import MinMaxBtnCanva from "./MinMaxBtnCanva";
+import ConfirmationModal from "./Modal";
 
 const Canvas = (props) => {
   const pagePdfIndex = props.pagesIndexes;
-  // console.log(props?.annotaionType,'annotaionType')
-  // console.log(props?.annotationData,'annotationData')
-  // console.log(props?.annotaionText,'annotaionText')
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -21,11 +19,32 @@ const Canvas = (props) => {
   const [textBoxColor, setTextBoxColor] = useState("pink");
   const [textData, setTextData] = useState(null);
   const [minMaxCanvaWidth, setMinMaxCanvaWidth] = useState("40%");
+  const [showModal, setShowModal] = useState(false);
+  const [linkCardTextMapId, setlinkCardTextMapId] = useState(null);
+ 
+
+  const handleShowModal = (id) => {
+    setShowModal(true);
+    setlinkCardTextMapId(id)
+
+  };
+  const handleConfirm = () => {
+    props.setMappedId(linkCardTextMapId);
+    let viewer = props.viewerIns.ej2_instances[0];
+    viewer.annotation.setAnnotationMode('Ink');
+
+  };
+
 
   useEffect(() => {
-    props?.annotaionText &&
-      addPdfTextToCanva(props?.annotaionText, props?.mappedId);
+    if(props?.annotaionText){
+        addPdfTextToCanva(props?.annotaionText, props?.mappedId)
+    }else if(props.rightLinkMappedId) {
+      addPdfTextToCanva(props?.annotaionText, props?.mappedId, props.rightLinkMappedId)
+    }
   }, [props?.annotaionText]);
+
+
   // useEffect(() => {
   //   props?.droppedText &&
   //     addPdfTextToCanva(props?.droppedText);
@@ -43,7 +62,7 @@ const Canvas = (props) => {
     context.strokeStyle = "black";
     context.lineWidth = 5;
     contextRef.current = context;
-    context.strokeStyle = "#ff0000"; // Stroke color
+    context.strokeStyle = "#ff0000";
   }, []);
 
   useEffect(() => {
@@ -86,8 +105,9 @@ const Canvas = (props) => {
       setNotes([...notes, newNote]);
     }
   };
-  const addPdfTextToCanva = (text, mappedId) => {
-    if (text !== null && text.trim() !== "") {
+  
+  const addPdfTextToCanva = (text, mappedId, rightArrowLinkId) => {
+    if (text !== null && text?.trim() !== "" && mappedId && rightArrowLinkId === undefined) {
       const newNotePdfExtracting = {
         id: pdfHighLightedText.length + 1,
         linkingId: mappedId,
@@ -98,9 +118,19 @@ const Canvas = (props) => {
         height: 200,
         color: textBoxColor,
       };
-      setPdFHighLightedText([...pdfHighLightedText, newNotePdfExtracting]);
+      setPdFHighLightedText(prevState => [...prevState, newNotePdfExtracting]);
+    } else if (rightArrowLinkId !== undefined) {
+      setPdFHighLightedText(prevState =>
+        prevState.map(ele =>
+          ele.linkingId === mappedId
+            ? { ...ele, rightLinkId: rightArrowLinkId }
+            : ele
+        )
+      );
     }
   };
+  
+
   const handleDragChange = (type, id, text) => {
     if (type == "note") {
       setNotes(
@@ -149,10 +179,10 @@ const Canvas = (props) => {
     const newTextbox = {
       id: textboxes.length + 1,
       text: "",
-      x: 100,
-      y: 100,
+      x: 50,
+      y: 50,
       width: 200,
-      height: 100,
+      height: 200,
       color: "violet",
     };
     setTextboxes([...textboxes, newTextbox]);
@@ -200,11 +230,26 @@ const Canvas = (props) => {
         (ele) => linkingId == ele.pageLinkedId
       );
       if (pageNumberArr) {
-        props.viewerIns.navigation.goToPage(pageNumberArr[0].pageIndex + 1);
+        props.viewerIns.navigation.goToPage(pageNumberArr[0].extrPageIndex + 1);
       }
     } else {
       props.viewerIns.annotationModule.selectAnnotation(props.mappedId);
     }
+  };
+  const linkOrGotoAnnotatedpage = (e, rightLinkId,pdfExtractedMappedId) => {
+    console.log(rightLinkId,'rightLinkId')
+    e.stopPropagation();
+    if (rightLinkId) {
+      const pageNumberArr = props?.annoDict?.filter(
+        (ele) => rightLinkId == ele.rightLinkId
+      );
+      if (pageNumberArr) {
+        props.viewerIns.navigation.goToPage(pageNumberArr[0].rightLinkpageIndex + 1);
+      }
+    } else {
+      handleShowModal(pdfExtractedMappedId)
+    }
+   
   };
 
   const maxCanvaWidthFunc =()=>{
@@ -284,15 +329,20 @@ const Canvas = (props) => {
               cursor: "move",
             }}
           > 
-            <div className="input-group">
-              <em className="text-primary input-group-text " onClick={(e) =>goToAnnoPageLinkage(e, pdfHighLightedText.linkingId)}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"} className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+            <div className="input-group input-group-sm">
+              <em title={`${pdfHighLightedText.id}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkage(e, pdfHighLightedText.linkingId)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"}  viewBox="0 0 16 16">
                   <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                 </svg>
               </em>
-              <input  className="form-control form-control-sm text-white font-weight-bold text-capitalize" style={{ background: " rgb(254,166,154)" }}/>
+              <input  className="form-control form-control-sm text-white font-weight-bold text-capitalize" style={{ background: " rgb(254,166,154)" ,fontSize:"11px"}}/>
+              <em title={`${pdfHighLightedText.id}`} className="text-primary input-group-text"  onClick={(e)=> linkOrGotoAnnotatedpage(e, pdfHighLightedText.rightLinkId,pdfHighLightedText.linkingId)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor="pointer" viewBox="0 0 16 16">
+                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m-3.5 7.5a.5.5 0 0 1 0-1H10.293l-2.147-2.146a.5.5 0 0 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 1 1-.708-.708L10.293 8z" />
+              </svg>
+              </em>
             </div>
-            <div className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{width: "100%", height: "80%", backgroundColor: "#white", border: "none", resize: "none", outline: "none", overflow: "hidden",}}>
+            <div className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{width: "100%", height: "80%", backgroundColor: "#fff", border: "none", resize: "none", outline: "none", overflow: "hidden",fontSize:"16px"}}>
               {pdfHighLightedText.text}
             </div>
           </Rnd>
@@ -317,24 +367,30 @@ const Canvas = (props) => {
               // backgroundColor: textbox.color,
             }}
           >
-            <div className="card card-body rounded-3">
+            <div className="card card-body rounded-3 p-1" style={{height:"80%",width:"100%"}}>
             <textarea placeholder="Write something here..."
               value={textbox.text}
               onChange={(e) => handleTextboxChange(textbox.id, e.target.value)}
               style={{
                 width: "100%",
                 height: "100%",
-                backgroundColor: "white",
+                backgroundColor: "#fff",
                 border: "none",
                 resize: "none",
                 outline: "none",
-                color:"black"
+                color:"black",
+                overflow: "hidden",
               }}
             />
             </div>
           </Rnd>
         ))}
       </div>
+      <ConfirmationModal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 };

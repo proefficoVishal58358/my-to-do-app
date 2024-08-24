@@ -29,13 +29,14 @@ const PdfViewerComp = () => {
   const [annotaionType, setAnnotaionType] = useState(null);
   const [annotaionText, setAnnotaionText] = useState(null);
   const [pagesIndexes, setPageIndexes] = useState<{ pageIndex: number }[]>([]);
-  const [annoDict, setAnnoDict] = useState<{ pageIndex: number,pageLinkedId:number }[]>([]);
+  const [annoDict, setAnnoDict] = useState<{ extrPageIndex: number,pageLinkedId:string }[]>([]);
   const [viewerIns, setViewerIns] = useState<any>(null);
   const [annotId, setAnnotId] = useState<any>('')
   const [linkMap, setLinkMap] = useState<LinkMap>({})
   const [linkA, setLinkA] = useState<any>('');
   const [linkB, setLinkB] = useState<any>('');
   const [mappedId, setMappedId] = useState<any>('');
+  const [rightLinkMappedId, setRightLinkMappedId] = useState<any>('');
   let viewer: PdfViewerComponent | null = null;
   const handleAnnotationAdd = async (args: any) => {
     console.log('args',args)
@@ -45,24 +46,32 @@ const PdfViewerComp = () => {
     setAnnotaionText(args.textMarkupContent);
     setPageIndexes((prev) => [...prev, { pageIndex: argsPageIndex + 1 }]);
     setAnnotId(args);
-    setMappedId(args.annotationId);
-    setAnnoDict((prev) => [...prev, {pageIndex : argsPageIndex, pageLinkedId : args.annotationId}]);
+    if(args.annotationType!="Ink"){
+      setMappedId(args.annotationId);
+      setAnnoDict((prev)=> [...prev,{ extrPageIndex: argsPageIndex, pageLinkedId: args.annotationId}]);
+    }else{
+      setRightLinkMappedId(args.annotationId);
+      setAnnoDict(prevState =>
+        prevState.map(ele =>
+          ele.pageLinkedId == mappedId ? { ...ele, rightLinkId: args.annotationId, rightLinkpageIndex: argsPageIndex} : ele
+        )
+      );
+      }
+
+      console.log('annoDict',annoDict)
+
+
     if (!linkA) {
       setLinkA(args)
     } else if (linkA.annotationId !== args.annotationId) {
         setLinkB(args)
     }    
-    if (args.annotationType!='Ink'){
-      viewerIns.annotation.setAnnotationMode("None")
-    }
       }
-  console.log('annote dictionary',annoDict)
-
-const handleAnnotationRemove = async (args: any) => {
-  setAnnotId('')
-  setLinkB('')
-  setLinkA('')
-}
+    const handleAnnotationRemove = async (args: any) => {
+      setAnnotId('')
+      setLinkB('')
+      setLinkA('')
+    }
 
   useEffect(() => {
     const viewerContainer = document.getElementById('container');
@@ -116,6 +125,7 @@ const handleAnnotationRemove = async (args: any) => {
           annotId={annotId}
           viewer={viewer}
           setMappedId={setMappedId}
+          rightLinkMappedId={rightLinkMappedId}
           annoDict={annoDict}
           setAnnoDict={setAnnoDict}
         />
