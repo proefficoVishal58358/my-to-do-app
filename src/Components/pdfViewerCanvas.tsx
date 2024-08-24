@@ -31,46 +31,62 @@ const PdfViewerComp = () => {
   const [annotaionType, setAnnotaionType] = useState(null);
   const [annotaionText, setAnnotaionText] = useState(null);
   const [pagesIndexes, setPageIndexes] = useState<{ pageIndex: number }[]>([]);
-  const [annoDict, setAnnoDict] = useState<{ extrPageIndex: number,pageLinkedId:string }[]>([]);
+  const [argIndexes, setArgIndexes] = useState(null);
+  const [annoDict, setAnnoDict] = useState<{ extrPageIndex: number, pageLinkedId:string }[]>([]);
+  const [annoDictTextBox, setAnnoDictTextBox] = useState<{ textBoxPageIndex: number, pageLinkedId:string }[]>([]);
   const [viewerIns, setViewerIns] = useState<any>(null);
   const [annotId, setAnnotId] = useState<any>('')
   const [linkMap, setLinkMap] = useState<LinkMap>({})
   const [linkA, setLinkA] = useState<any>('');
   const [linkB, setLinkB] = useState<any>('');
   const [mappedId, setMappedId] = useState<any>('');
-  const [rightLinkMappedId, setRightLinkMappedId] = useState<any>('');
+  const [rightLinkMappedId, setRightLinkMappedId] = useState<any>(undefined);
+  const [textBoxLinkId, setTextBoxLinkId] = useState<any>(undefined);
   const[sizeCursor,setSizeCursor]=useState('ew-resize');
+  const[flagTextBox,setFlagForTextbox]=useState<boolean >(false);
   let viewer: PdfViewerComponent | null = null;
+
   const handleAnnotationAdd = async (args: any) => {
     console.log('args',args)
-    const argsPageIndex = args.pageIndex;
+    let argsPageIndex = args.pageIndex;
+    setArgIndexes(argsPageIndex);
     setAnnotationData(args.annotationSettings);
     setAnnotaionType(args.annotationType);
     setAnnotaionText(args.textMarkupContent);
     setPageIndexes((prev) => [...prev, { pageIndex: argsPageIndex + 1 }]);
     setAnnotId(args);
     if(args.annotationType!="Ink"){
+      console.log('args.annotationType',args.annotationType)
       setMappedId(args.annotationId);
-      setAnnoDict((prev)=> [...prev,{ extrPageIndex: argsPageIndex, pageLinkedId: args.annotationId}]);
+        setRightLinkMappedId(undefined)
+        setAnnoDict((prev)=> [...prev,{ extrPageIndex: argsPageIndex, pageLinkedId: args.annotationId}]);
     }else{
+      if(!flagTextBox){
+        setRightLinkMappedId(args.annotationId);
+        setAnnoDict(prevState =>
+          prevState.map(ele =>
+            ele.pageLinkedId == mappedId ? { ...ele, rightLinkId: args.annotationId, rightLinkpageIndex: argsPageIndex} : ele
+          )
+        );
+      }else{
+        setRightLinkMappedId(undefined);
+        setTextBoxLinkId(args.annotationId)
+        setAnnoDictTextBox((prev)=> [...prev,{ textBoxPageIndex: argsPageIndex, pageLinkedId: args.annotationId}]);
+      }
       console.log(mappedId,'mappedId')
-      setRightLinkMappedId(args.annotationId);
-      setAnnoDict(prevState =>
-        prevState.map(ele =>
-          ele.pageLinkedId == mappedId ? { ...ele, rightLinkId: args.annotationId, rightLinkpageIndex: argsPageIndex} : ele
-        )
-      );
       }
-
-      console.log('annoDict',annoDict)
-
-
-    if (!linkA) {
-      setLinkA(args)
-    } else if (linkA.annotationId !== args.annotationId) {
+      if (!linkA) {
+        setLinkA(args)
+      } else if (linkA.annotationId !== args.annotationId) {
         setLinkB(args)
-    }    
-      }
+      }    
+    }
+    console.log('annoDict',annoDict);
+
+    
+
+
+
     const handleAnnotationRemove = async (args: any) => {
       setAnnotId('')
       setLinkB('')
@@ -87,6 +103,11 @@ const PdfViewerComp = () => {
     }
 }, []); 
 
+
+console.log('flagTextBox',flagTextBox);
+    console.log('textBoxLinkId',textBoxLinkId);
+    console.log('annoDictTextBox',annoDictTextBox);
+
   return (
     <Split
     sizes={[60, 40]}
@@ -94,16 +115,15 @@ const PdfViewerComp = () => {
     expandToMin={false}
     gutterSize={10}
     gutterAlign="center"
-    snapOffset={30}
-    dragInterval={1}
     direction="horizontal"
     cursor={sizeCursor}
-    style={{ height: "100%", width: "100%", display:"flex", overflowX:"hidden" }}
+    style={{display:"flex", overflowX:"hidden" }}
   >
         <PdfViewerComponent
           id="container"
           documentPath="http://localhost:3000/Mr. Deepak and another Vs. Smt. Jagwati and others9dc2b3 (3).pdf"
           resourceUrl="https://cdn.syncfusion.com/ej2/24.1.41/dist/ej2-pdfviewer-lib"
+          inkAnnotationSettings={{author: 'Syncfusion', strokeColor: 'red', thickness: 6, opacity: 0.8}}
           ref={pdfViewerRef}
           enableTextSearch={true}
           annotationAdd={handleAnnotationAdd}
@@ -138,9 +158,16 @@ const PdfViewerComp = () => {
           annotId={annotId}
           viewer={viewer}
           setMappedId={setMappedId}
+          setTextBoxLinkId={setTextBoxLinkId}
+          setRightLinkMappedId={setRightLinkMappedId}
           rightLinkMappedId={rightLinkMappedId}
+          textBoxLinkId={textBoxLinkId}
           annoDict={annoDict}
+          annoDictTextBox={annoDictTextBox}
           setAnnoDict={setAnnoDict}
+          setAnnoDictTextBox={setAnnoDictTextBox}
+          argIndexes={argIndexes}
+          setFlagForTextbox={setFlagForTextbox}
         />
     </Split>
   );
