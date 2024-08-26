@@ -2,9 +2,8 @@ import React, { useRef, useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
 import "bootstrap/dist/css/bootstrap.css";
 import Toolbar from "./canvasToolBar";
-import MinMaxBtnCanva from "./MinMaxBtnCanva";
 import ConfirmationModal from "./Modal";
-
+import ColorPickerComp from "./colorPickerComp";
 const Canvas = (props) => {
   const pagePdfIndex = props.pagesIndexes;
   const canvasRef = useRef(null);
@@ -20,8 +19,34 @@ const Canvas = (props) => {
   const [textData, setTextData] = useState(null);
   const [minMaxCanvaWidth, setMinMaxCanvaWidth] = useState("40%");
   const [showModal, setShowModal] = useState(false);
-  const [linkCardTextMapId, setlinkCardTextMapId] = useState(null);
- 
+  const [linkCardTextMapId, setlinkCardTextMapId] = useState(null); 
+  const [showPicker, setShowPicker] = useState(false);
+  const [colorPickerIndex, setColorPickerIndex] = useState(false);
+  const [cardBoxtype, setCardBoxtype] = useState('pdfTextCard');
+  const [color,setColor]=useState('pink')
+
+  const handleChooseColor = (e,index,type) => {
+  setShowPicker(!showPicker);
+  setColorPickerIndex(index);
+  setCardBoxtype(type);
+};
+  const handleChangeComplete = (color) => {
+    setColor(color.hex);
+    if(cardBoxtype=="pdfTextCard"){
+      setPdFHighLightedText(prevState =>
+        prevState.map((ele,index) =>
+          index === colorPickerIndex ? { ...ele,color:color.hex,textColor:color}: ele
+        )
+      );
+    }else if(cardBoxtype=="textBoxCard"){
+      setTextboxes(prevState =>
+        prevState.map((ele,index) =>
+         (index ==colorPickerIndex)? { ...ele,color:color.hex,textColor:color}: ele
+        )
+      );
+    }
+    // setShowPicker(false);
+  };
 
   const handleShowModal = (id) => {
     setShowModal(true);
@@ -31,6 +56,7 @@ const Canvas = (props) => {
       setlinkCardTextMapId(undefined)
     }
   };
+
   const handleConfirm = () => {
     if(linkCardTextMapId){
       props.setMappedId(linkCardTextMapId);
@@ -42,7 +68,6 @@ const Canvas = (props) => {
     viewer.annotation.setAnnotationMode('Ink');
   };
 
-
   useEffect(() => {
     if(props?.annotaionText){
         addPdfTextToCanva(props?.annotaionText, props?.mappedId, props.rightLinkMappedId, props.argIndexes)
@@ -52,26 +77,26 @@ const Canvas = (props) => {
   }, [props?.annotaionText,props.rightLinkMappedId]);
 
 
-    useEffect(()=>{
-    if(props.textBoxLinkId){
-      addTextBox(props.textBoxLinkId,props.annoDictTextBox,props.argIndexes)
-    }
-    },[props.textBoxLinkId]);
+  useEffect(()=>{
+  if(props.textBoxLinkId){
+    addTextBox(props.textBoxLinkId,props.annoDictTextBox,props.argIndexes)
+  }
+  },[props.textBoxLinkId]);
 
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    canvas.width = window.innerWidth * 2;
-    canvas.height = window.innerHeight * 2;
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
-    const context = canvas.getContext("2d");
-    context.scale(2, 2);
-    context.lineCap = "round";
-    context.strokeStyle = "black";
-    context.lineWidth = 5;
-    contextRef.current = context;
-    context.strokeStyle = "#ff0000";
+  const canvas = canvasRef.current;
+  canvas.width = window.innerWidth * 2;
+  canvas.height = window.innerHeight * 2;
+  canvas.style.width = `${window.innerWidth}px`;
+  canvas.style.height = `${window.innerHeight}px`;
+  const context = canvas.getContext("2d");
+  context.scale(2, 2);
+  context.lineCap = "round";
+  context.strokeStyle = "black";
+  context.lineWidth = 5;
+  contextRef.current = context;
+  context.strokeStyle = "#ff0000";
   }, []);
 
   useEffect(() => {
@@ -123,12 +148,16 @@ const Canvas = (props) => {
         linkingId: mappedId,
         text,
         x: 50,
-        y: 50,
+        y: ((pdfHighLightedText.length*200)+10),
         width: 200,
         height: 200,
         color: textBoxColor,
       };
-      setPdFHighLightedText(prevState => [...prevState, newNotePdfExtracting]);
+      setPdFHighLightedText(prevState =>{
+              if(!prevState.includes(text)){
+               return [...prevState, newNotePdfExtracting]
+              }
+      });
     } else if (rightArrowLinkId !== undefined) {
       setPdFHighLightedText(prevState =>
         prevState.map(ele =>
@@ -144,13 +173,17 @@ const Canvas = (props) => {
       const newTextbox = {
         id: textboxes.length + 1,
         text:textboxes.text,
-        x: 50,
-        y: 50,
+        x: (250),
+        y: ((textboxes.length*200)+10),
         width: 200,
         height: 200,
-        color: "violet",
+        color: "#fff",
       };
-      setTextboxes([...textboxes, newTextbox]);
+      setTextboxes(prev=>{
+        if(!prev.includes(textboxes.text)){
+          return [...prev, newTextbox]
+        }
+      });
     }else if(linkId){
       setTextboxes(prevState =>
         prevState.map(ele =>
@@ -159,10 +192,6 @@ const Canvas = (props) => {
       );
     }
   };
-
-
-console.log('textboxes',textboxes);
-
 
   const handleDragChange = (type, id, text) => {
     if (type == "note") {
@@ -209,7 +238,8 @@ console.log('textboxes',textboxes);
   };
 
  
-  const handleTextboxChange = (id, text) => {
+  const handleTextboxChange = (id, text,e) => {
+    e.stopPropagation();
     setTextboxes(
       textboxes.map((textbox) =>
         textbox.id === id ? { ...textbox, text } : textbox
@@ -237,17 +267,19 @@ console.log('textboxes',textboxes);
     const canvas = canvasRef.current;
     const context = contextRef.current;
     context.clearRect(0, 0, canvas.width, canvas.height);
+    props.viewerIns.undo();
     setNotes([]);
     setTextboxes([]);
     setPdFHighLightedText([]);
     props.setMappedId("");
-    props.setTextBoxLinkId("");
+    props.setTextBoxLinkId(undefined);
     props.setRightLinkMappedId(undefined);
     props.setAnnoDict([]);
     props.setAnnoDictTextBox([]);
     props.setFlagForTextbox(false);
   };
 
+ 
   const goToAnnoPageLinkage = (e, linkingId,linkagePageIndex) => {
     e.stopPropagation();
     if (linkingId) {
@@ -257,12 +289,10 @@ console.log('textboxes',textboxes);
     }
   };
   const linkOrGotoAnnotatedpage = (e, rightLinkId, pdfExtractedMappedId, linkagePageIndex) => {
-    console.log(rightLinkId,'rightLinkId')
     e.stopPropagation();
     if (rightLinkId) {
         props.viewerIns.navigation.goToPage(linkagePageIndex + 1);
     } else {
-      console.log('pdfExtractedMappedId',pdfExtractedMappedId)
       handleShowModal(pdfExtractedMappedId)
     }
    
@@ -275,9 +305,6 @@ console.log('textboxes',textboxes);
       handleShowModal();
     }
   };
-
-  
-
   return (
     <div style={{background: "azure" }}>
       <Toolbar 
@@ -285,7 +312,13 @@ console.log('textboxes',textboxes);
        onAddTextBox={addTextBox} 
        onClearAll={clearAll} 
        selectedColor={selectedColor} 
-       setSelectedColor={setSelectedColor}/>
+       setSelectedColor={setSelectedColor}
+       />
+      <ColorPickerComp 
+            handleChangeComplete={handleChangeComplete}
+            showPicker={showPicker}
+            color={color}
+            />
       <div style={{ position: "relative",overflowX:"scroll" }}>
         <canvas
           ref={canvasRef}
@@ -295,38 +328,9 @@ console.log('textboxes',textboxes);
           onMouseLeave={finishDrawing}
           style={{ zIndex: 1 }}
         />
-        {notes.map((note, index) => (
+        {pdfHighLightedText?.map((pdfHighLightedText, index) => (
           <Rnd
-            key={note.id}
-            size={{ width: note.width, height: note.height ,margin:"auto"}}
-            position={{ x: note.x, y: note.y}}
-            onDragStop={(e, d) => handleDragStop("note", note.id, d.x, d.y)}
-            onResizeStop={(e, direction, ref, delta, position) => {
-              handleResizeStop("note",note.id,ref.offsetWidth,ref.offsetHeight);
-            }}
-            style={{zIndex: 2,backgroundColor: selectedColor,cursor: "move",}}
-          >
-            <div
-              className="card card-body shadow"
-              onChange={(e) =>
-                handleDragChange("note", note.id, e.target.value)
-              }
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: note.color,
-                border: "none",
-                resize: "none",
-                outline: "none",
-              }}
-            >
-              {note.text}
-            </div>
-          </Rnd>
-        ))}
-        {pdfHighLightedText.map((pdfHighLightedText, index) => (
-          <Rnd
-            key={pdfHighLightedText.id}
+          key={pdfHighLightedText.id}
             size={{width: pdfHighLightedText.width,height: pdfHighLightedText.height}}
             position={{x: pdfHighLightedText.x, y: pdfHighLightedText.y}}
             onDragStop={(e, d) =>
@@ -336,10 +340,10 @@ console.log('textboxes',textboxes);
             }}
             style={{
               zIndex: 2,
-              backgroundColor: "",
               cursor: "move",
             }}
           > 
+            <div  className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{width: "95%", height: "100%", backgroundColor: `${pdfHighLightedText.color}`, border: "none", resize: "none", outline: "none", overflow: "hidden",fontSize:"16px"}}>
             <div className="input-group input-group-sm">
               <em title={`To Page no. ${pdfHighLightedText.argIndex+1}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkage(e, pdfHighLightedText.linkingId,pdfHighLightedText.argIndex)}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"}  viewBox="0 0 16 16">
@@ -354,13 +358,14 @@ console.log('textboxes',textboxes);
               </svg>
               <p className="badge badge-sm bg-secondary m-1">{pdfHighLightedText.rightArgIndex?pdfHighLightedText.rightArgIndex+1:""}</p>
               </em>
+              <em style={{cursor:"pointer"}} className="fa-solid fa-paintbrush text-lg input-group-text" onClick={(e)=> handleChooseColor(e,index,'pdfTextCard')} ></em>
             </div>
-            <div className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{width: "100%", height: "80%", backgroundColor: "#fff", border: "none", resize: "none", outline: "none", overflow: "hidden",fontSize:"16px"}}>
               {pdfHighLightedText.text}
             </div>
           </Rnd>
+            
         ))}
-        {textboxes.map((ele, index) => (
+        {textboxes?.map((ele, index) => (
           <Rnd
             key={ele.id}
             size={{ width: ele.width, height: ele.height}}
@@ -372,26 +377,27 @@ console.log('textboxes',textboxes);
             style={{
               zIndex: 2,
               cursor: "move",
-              // backgroundColor: ele.color,
             }}
           >
-            <div className="card card-body rounded-3 p-1" style={{height:"100%",width:"100%"}}>
+            <div  className="card card-body rounded-3 p-1" style={{height:"100%", width:"95%", backgroundColor: `${ele.color}`}}>
             <div className="input-group input-group-sm">
-            <em title={`To Page no. ${ele.pageIndex?ele.pageIndex+1:"No Linkage"}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkageOfTextBox(e, ele.pageIndex)}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"}  viewBox="0 0 16 16">
-              <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
-            </svg>
-            <p className={`badge badge-sm ${ele.pageIndex?'bg-success':'bg-warning'} m-1`}>{ele.pageIndex ? ele.pageIndex+1 :"No Link"}</p>
-            </em>
+              <em title={`To Page no. ${ele.pageIndex?ele.pageIndex+1:"No Linkage"}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkageOfTextBox(e, ele.pageIndex)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"}  viewBox="0 0 16 16">
+                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+              </svg>
+              <p className={`badge badge-sm ${ele.pageIndex?'bg-success':'bg-warning'} m-1`}>{ele.pageIndex ? ele.pageIndex+1 :""}</p>
+              </em>
+              <em style={{cursor:"pointer"}} className="fa-solid fa-paintbrush text-lg input-group-text" onClick={(e)=> handleChooseColor(e,index,'textBoxCard')}></em>
             </div>               
             <textarea placeholder="Write something here..."
               value={ele.text}
-              onChange={(e) => handleTextboxChange(ele.id, e.target.value)}
-              style={{backgroundColor: "#fff",border: "none",resize: "none",outline: "none",color:"black",overflow: "hidden",height:"70%"}}
+              onChange={(e) => handleTextboxChange(ele.id, e.target.value,e)}
+              style={{backgroundColor: `${ele.color}`,border: "none",resize: "none",outline: "none", color:`${ele.textColor}`,overflow: "hidden",height:"50%"}}
             />
           </div>               
           </Rnd>
         ))}
+     
       </div>
       <ConfirmationModal show={showModal} onHide={() => setShowModal(false)} onConfirm={handleConfirm}/>
     </div>

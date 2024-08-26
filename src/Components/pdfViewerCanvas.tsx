@@ -83,10 +83,6 @@ const PdfViewerComp = () => {
     }
     console.log('annoDict',annoDict);
 
-    
-
-
-
     const handleAnnotationRemove = async (args: any) => {
       setAnnotId('')
       setLinkB('')
@@ -104,20 +100,16 @@ const PdfViewerComp = () => {
 }, []); 
 
 
-console.log('flagTextBox',flagTextBox);
-    console.log('textBoxLinkId',textBoxLinkId);
-    console.log('annoDictTextBox',annoDictTextBox);
-
   return (
     <Split
-    sizes={[60, 40]}
-    minSize={[400, 300]}
+    sizes={[40, 60]}
+    minSize={[100]}
     expandToMin={false}
-    gutterSize={10}
+    gutterSize={5}
     gutterAlign="center"
     direction="horizontal"
     cursor={sizeCursor}
-    style={{display:"flex", overflowX:"hidden" }}
+    style={{display:"flex", overflowX:"hidden" ,backgroundColor:"gray"}}
   >
         <PdfViewerComponent
           id="container"

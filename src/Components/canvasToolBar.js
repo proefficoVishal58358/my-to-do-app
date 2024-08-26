@@ -1,39 +1,54 @@
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import ClipBoard from "./clipBoard";
 const Toolbar = ({ onAddStickyNote, onAddTextBox, onClearAll, selectedColor, setSelectedColor, addAnnotation }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [clipBoardTextItems, setClipBoardTextItems] = useState([]);
   const [clipBoardFlag, setclipBoardFlag] = useState(false);
   const [clipBoardSmalDiv, setClipBoardSmalDiv] = useState(false);
-  const [activeBtn,setActiveBtn]=useState(false);
   const colors = ['yellow', 'lightblue', 'lightgreen', 'lightcoral', 'lightpink', 'white'];
 
   const toggleCollapse = () => {
     setIsCollapsed(prev => !prev);
   }; 
 
-  const handleOpenClipBoard = () => {
-    setclipBoardFlag(true);
-    setActiveBtn(true);
-    navigator.clipboard.readText()
-    .then(text => {
-      setClipBoardTextItems(prev => {
-        if (!prev.includes(text)) {
-          return [...prev, text];
-        }
-        return prev;
-      });
-    })
+  const handleOpenClipBoard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text.trim()) {
+        setclipBoardFlag(true);
+        setClipBoardTextItems(prev => {
+          if (!prev.includes(text)) {
+            return [...prev, text];
+          }
+          return prev;
+        });
+      } else {
+        console.log("Clipboard is empty");
+      }
+    } catch (error) {
+      console.error("Failed to read clipboard contents:", error);
+    }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === 'c') {
+        handleOpenClipBoard();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []); 
+
 const handleCloseClipBoard=()=>{
   setclipBoardFlag(false);
 }
 
-
 const deleteClipBoardCopyText=(idx)=>{
-  console.log('idx',idx)
  const filteredClipBoard= clipBoardTextItems.filter((ele,index)=>index!=idx);
  setClipBoardTextItems(filteredClipBoard);
 }
@@ -69,9 +84,8 @@ const deleteClipBoardCopyText=(idx)=>{
             display: 'flex',
             flexDirection: 'column',
           }}>
-            {colors.map(color => (
-              <button
-                key={color}
+            {colors.map((color,index) => (
+              <button key={`btn_${index}`}
                 onClick={() => setSelectedColor(color)}
                 style={{
                   backgroundColor: color,
@@ -86,35 +100,16 @@ const deleteClipBoardCopyText=(idx)=>{
               />
             ))}
           </div>
+      </div>
 
-    </div>
-    {
-      clipBoardFlag &&
-          <div onClick={(e)=>{ setClipBoardSmalDiv(false)}} className={`clipboard-container ${clipBoardFlag ? 'visible' : ''} card card-body rounded p-0 mt-3 mx-3 overflow-y-scroll position-relative`} style={{height:"500px", width:"400px", }}>
-            <button onClick={handleCloseClipBoard} className="btn btn-light border-2 rounded-2 position-fixed" style={{zIndex:"999"}}>
-            <em  className="fas fa-x text-danger fa-lg" ></em>
-            </button>
-              {clipBoardTextItems.length > 0 && <div className="d-flex justify-content-end p-2">
-                <button onClick={()=>setClipBoardTextItems([])} className="btn btn-secondary text-sm btn-sm text-white"> Clear All</button> 
-              </div>}
-              {clipBoardTextItems.length==0 && <div className=" mx-2 mt-5">
-                <p className="text-muted text-start text-capitalize text-center text-dark fa-lg">{"No Items"}</p>
-                </div>}
-              {clipBoardTextItems?.map((ele,index)=>
-              <>
-              <div key={`clip${index}`} className={`card shadow p-0 border-bottom border-2 mx-2 ${index==0?"mt-1":"mt-1"}`}>
-              <div className="d-flex p-2 justify-content-between">
-                <p className="text-muted text-start text-capitalize">{ele}</p>
-              </div>
-              {<div className="d-flex justify-content-end mb-2">
-                <button onClick={()=>deleteClipBoardCopyText(index)} className="btn btn-secondary text-sm btn-sm mx-2 text-white"> Delete</button> 
-              </div>}
-              </div>
-              </>
-                )}
-              
-          </div>
-        }
+        <ClipBoard 
+        clipBoardFlag={clipBoardFlag}
+        setClipBoardSmalDiv={setClipBoardSmalDiv}
+        handleCloseClipBoard={handleCloseClipBoard}
+        setClipBoardTextItems={setClipBoardTextItems}
+        clipBoardTextItems={clipBoardTextItems}
+        deleteClipBoardCopyText={deleteClipBoardCopyText}
+        />
         </>
   );
 };
