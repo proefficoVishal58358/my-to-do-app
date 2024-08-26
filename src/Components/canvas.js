@@ -327,6 +327,7 @@ const Canvas = (props) => {
           onMouseMove={draw}
           onMouseLeave={finishDrawing}
           style={{ zIndex: 1 }}
+          onClick={ ()=>setShowPicker(false)}
         />
         {pdfHighLightedText?.map((pdfHighLightedText, index) => (
           <Rnd
@@ -352,15 +353,22 @@ const Canvas = (props) => {
               <p className="badge badge-sm bg-success m-1">{pdfHighLightedText.argIndex+1}</p>
               </em>
               <input  className="form-control form-control-sm text-white font-weight-bold text-capitalize" style={{ background: " rgb(254,166,154)" ,fontSize:"11px"}}/>
+             
+              <em style={{cursor:"pointer"}} className="fa-solid fa-paintbrush text-lg input-group-text" onClick={(e)=> handleChooseColor(e,index,'pdfTextCard')} ></em>
+            </div>
+            <span className="">
+              {pdfHighLightedText.text}
+            </span>
+            <div className="d-flex justify-content-end fixed-bottom">
+              <div className="input-group input-group-sm ">
               <em title={`To Page no. ${pdfHighLightedText.rightArgIndex?pdfHighLightedText.rightArgIndex+1:"No Link"}`} className="text-primary input-group-text"  onClick={(e)=> linkOrGotoAnnotatedpage(e, pdfHighLightedText.rightLinkId,pdfHighLightedText.linkingId,pdfHighLightedText.rightArgIndex)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor="pointer" viewBox="0 0 16 16">
                 <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m-3.5 7.5a.5.5 0 0 1 0-1H10.293l-2.147-2.146a.5.5 0 0 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 1 1-.708-.708L10.293 8z" />
               </svg>
               <p className="badge badge-sm bg-secondary m-1">{pdfHighLightedText.rightArgIndex?pdfHighLightedText.rightArgIndex+1:""}</p>
               </em>
-              <em style={{cursor:"pointer"}} className="fa-solid fa-paintbrush text-lg input-group-text" onClick={(e)=> handleChooseColor(e,index,'pdfTextCard')} ></em>
+              </div>
             </div>
-              {pdfHighLightedText.text}
             </div>
           </Rnd>
             
