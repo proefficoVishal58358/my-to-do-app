@@ -267,7 +267,6 @@ const Canvas = (props) => {
     const canvas = canvasRef.current;
     const context = contextRef.current;
     context.clearRect(0, 0, canvas.width, canvas.height);
-    props.viewerIns.undo();
     setNotes([]);
     setTextboxes([]);
     setPdFHighLightedText([]);
@@ -277,6 +276,7 @@ const Canvas = (props) => {
     props.setAnnoDict([]);
     props.setAnnoDictTextBox([]);
     props.setFlagForTextbox(false);
+    props.viewerIns.undo();
   };
 
  
