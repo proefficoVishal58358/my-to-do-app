@@ -24,6 +24,7 @@ import {
   AnnotationSelectorSettingsModel
 } from "@syncfusion/ej2-react-pdfviewer";
 import Canvas from "./canvas";
+import CanvasNew from "./canvasNew";
 const PdfViewerComp = () => {
   interface LinkMap {[key: string]: string;}
   const pdfViewerRef = useRef(null);
@@ -109,7 +110,7 @@ const PdfViewerComp = () => {
     gutterAlign="center"
     direction="horizontal"
     cursor={sizeCursor}
-    style={{display:"flex", overflowX:"hidden" ,backgroundColor:"gray"}}
+    style={{display:"flex", overflowX:"hidden" ,backgroundColor:"gray",height:"100vh"}}
   >
         <PdfViewerComponent
           id="container"
@@ -139,7 +140,7 @@ const PdfViewerComp = () => {
           />
         </PdfViewerComponent>
         
-        <Canvas
+        <CanvasNew
           pdfViewerRef={pdfViewerRef}
           annotaionType={annotaionType}
           annotationData={annotationData}
