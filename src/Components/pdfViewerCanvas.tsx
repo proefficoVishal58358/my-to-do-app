@@ -24,9 +24,10 @@ import {
   AnnotationSelectorSettingsModel
 } from "@syncfusion/ej2-react-pdfviewer";
 import Canvas from "./canvas";
-import CanvasNew from "./canvasNew";
+import CanvasNew2 from "./canvasNew2";
 const PdfViewerComp = () => {
   interface LinkMap {[key: string]: string;}
+  const [sizes, setSizes] = useState([50, 50]);
   const pdfViewerRef = useRef(null);
   const [annotationData, setAnnotationData] = useState(null);
   const [annotaionType, setAnnotaionType] = useState(null);
@@ -40,7 +41,7 @@ const PdfViewerComp = () => {
   const [linkMap, setLinkMap] = useState<LinkMap>({})
   const [linkA, setLinkA] = useState<any>('');
   const [linkB, setLinkB] = useState<any>('');
-  const [mappedId, setMappedId] = useState<any>('');
+  const [mappedId, setMappedId] = useState<any>(undefined);
   const [rightLinkMappedId, setRightLinkMappedId] = useState<any>(undefined);
   const [textBoxLinkId, setTextBoxLinkId] = useState<any>(undefined);
   const[sizeCursor,setSizeCursor]=useState('ew-resize');
@@ -62,6 +63,7 @@ const PdfViewerComp = () => {
         setRightLinkMappedId(undefined)
         setAnnoDict((prev)=> [...prev,{ extrPageIndex: argsPageIndex, pageLinkedId: args.annotationId}]);
     }else{
+      console.log('flagTextBox',flagTextBox)
       if(!flagTextBox){
         setRightLinkMappedId(args.annotationId);
         setAnnoDict(prevState =>
@@ -100,18 +102,22 @@ const PdfViewerComp = () => {
     }
 }, []); 
 
-
+const handleResize = (newSizes) => {
+  setSizes(newSizes);
+  console.log('Resized to:', newSizes);
+};
   return (
     <Split
-    sizes={[40, 60]}
-    minSize={[100]}
+    sizes={[50, 50]}
+    minSize={100}
     expandToMin={false}
     gutterSize={5}
     gutterAlign="center"
     direction="horizontal"
     cursor={sizeCursor}
-    style={{display:"flex", overflowX:"hidden" ,backgroundColor:"gray",height:"100vh"}}
-  >
+    style={{display:"flex", overflowX:"hidden", backgroundColor:"gray", height:"100vh"}}
+    onDrag={(newSizes) => handleResize(newSizes)}
+    >
         <PdfViewerComponent
           id="container"
           documentPath="http://localhost:3000/Mr. Deepak and another Vs. Smt. Jagwati and others9dc2b3 (3).pdf"
@@ -121,6 +127,7 @@ const PdfViewerComp = () => {
           enableTextSearch={true}
           annotationAdd={handleAnnotationAdd}
           annotationRemove={handleAnnotationRemove}
+          style={{width:`${sizes[0]}%`}}
         >
           <Inject
             services={[
@@ -139,8 +146,8 @@ const PdfViewerComp = () => {
             ]}
           />
         </PdfViewerComponent>
-        
-        <CanvasNew
+        <CanvasNew2
+          style={{width:`${sizes[1]}%`}}
           pdfViewerRef={pdfViewerRef}
           annotaionType={annotaionType}
           annotationData={annotationData}

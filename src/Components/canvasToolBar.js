@@ -9,8 +9,6 @@ const Toolbar = ({ onAddStickyNote, onAddTextBox, onClearAll, selectedColor, set
   const [clipBoardSmalDiv, setClipBoardSmalDiv] = useState(false);
   const colors = ['yellow', 'lightblue', 'lightgreen', 'lightcoral', 'lightpink', 'white'];
 
- 
-
   const toggleCollapse = () => {
     setIsCollapsed(prev => !prev);
   }; 
@@ -71,18 +69,18 @@ const deleteClipBoardCopyText=(idx)=>{
           {/* <button className="btn btn-secondary btn-md mb-2" onClick={onAddStickyNote} title="Add Sticky Note">
             <i className="fas fa-sticky-note"></i>
           </button> */}
-          <button className={`btn btn-${fadeBoxBtn} btn-md mb-2`}  onClick={onAddTextBox} title="Add Text Box">
+          <button className={`btn btn-${fadeBoxBtn ? 'dark' : 'secondary' } btn-md mb-2`}  onClick={onAddTextBox} title="Add Text Box">
             <i className="fas fa-text-height"></i>
           </button>
-          <button className= {`btn btn-${fadePen} btn-md mb-2`} onClick={freeHandSketch} title="Annotation">
+          {/* <button className= {`btn btn-${fadePen ? 'dark' : 'secondary' } btn-md mb-2`} onClick={freeHandSketch} title="Annotation">
             <i className="fas fa-pen"></i>
-          </button>
+          </button> */}
         </>
       )}
        <button className="btn btn-primary btn-md mb-2" onClick={toggleCollapse} title={isCollapsed ? "Expand Toolbar" : "Collapse Toolbar"} style={{ backgroundColor: `${isCollapsed?"green":"red"}`, border: 'none' }}>
         <i className={`fas ${isCollapsed ? 'fa-plus-circle' : 'fa-x'}`}></i>
       </button>
-    <div style={{
+    {/* <div style={{
             position: 'fixed',
             bottom: '20px',
             right: '20px',
@@ -104,7 +102,7 @@ const deleteClipBoardCopyText=(idx)=>{
                 title={`Select ${color}`}
               />
             ))}
-          </div>
+          </div> */}
       </div>
 
         <ClipBoard 
