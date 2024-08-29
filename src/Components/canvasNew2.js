@@ -83,7 +83,7 @@ const CanvasNew2 = (props) => {
     console.log('props.argIndexes',props.argIndexes);
     console.log('props.annoDictTextBox',props.annoDictTextBox);
   if(props.textBoxLinkId){
-    addTextBox(props.textBoxLinkId,props.annoDictTextBox,props.argIndexes)
+    addTextBox(props.textBoxLinkId, props.annoDictTextBox, props.argIndexes)
   }
   },[props.textBoxLinkId]);
 
@@ -107,7 +107,7 @@ const CanvasNew2 = (props) => {
     if (text !== null && text?.trim() !== "" && mappedId && rightArrowLinkId === undefined) {
       const newNotePdfExtracting = {
         id: pdfHighLightedText.length + 1,
-        argIndex:argIndex,
+        argIndex:argIndex+1,
         linkingId: mappedId,
         text,
         x: 50,
@@ -125,7 +125,7 @@ const CanvasNew2 = (props) => {
       setPdFHighLightedText(prevState =>
         prevState.map(ele =>
           ele.linkingId === mappedId
-            ? { ...ele, rightLinkId: rightArrowLinkId , rightArgIndex:argIndex}: ele
+            ? { ...ele, rightLinkId: rightArrowLinkId , rightArgIndex:argIndex+1}: ele
         )
       );
     }
@@ -150,7 +150,7 @@ const CanvasNew2 = (props) => {
     }else if(linkId){
       setTextboxes(prevState =>
         prevState.map(ele =>
-         (linkId ==ele.textBoxlinkId || !ele.textBoxlinkId )? { ...ele, textBoxlinkId:linkId, pageIndex:textBoxPageIndex}: ele
+         (linkId ==ele.textBoxlinkId || !ele.textBoxlinkId )? { ...ele, textBoxlinkId:linkId, pageIndex:(textBoxPageIndex+1)}: ele
         )
       );
     }
@@ -248,7 +248,7 @@ console.log('textboxes',textboxes)
   const goToAnnoPageLinkage = (e, linkingId,linkagePageIndex) => {
     e.stopPropagation();
     if (linkingId) {
-        props.viewerIns.navigation.goToPage(linkagePageIndex + 1);
+        props.viewerIns.navigation.goToPage(linkagePageIndex);
     } else {
       props.viewerIns.annotationModule.selectAnnotation(props.mappedId);
     }
@@ -257,7 +257,7 @@ console.log('textboxes',textboxes)
   const linkOrGotoAnnotatedpage = (e, rightLinkId, pdfExtractedMappedId, linkagePageIndex) => {
     e.stopPropagation();
     if (rightLinkId) {
-        props.viewerIns.navigation.goToPage(linkagePageIndex + 1);
+        props.viewerIns.navigation.goToPage(linkagePageIndex);
     } else {
       handleShowModal(pdfExtractedMappedId)
     }
@@ -266,7 +266,7 @@ console.log('textboxes',textboxes)
   const goToAnnoPageLinkageOfTextBox = (e,pageIndex) => {
     e.stopPropagation();
     if(pageIndex){
-      props.viewerIns.navigation.goToPage(pageIndex + 1);
+      props.viewerIns.navigation.goToPage(pageIndex);
     }else{
       handleShowModal();
     }
@@ -388,11 +388,11 @@ const handleRemoveEvents=(e)=>{
             <div className="card card-body rounded-3 p-0" onChange={(e) => handleDragChange("pdfExtractedText", pdfHighLightedText.id, e.target.value)} style={{ width: "95%", height: "100%", backgroundColor: `${pdfHighLightedText.color}`, border: "none", resize: "none", outline: "none", overflow: "hidden",fontSize:"16px"}}>
             <div style={{zIndex: !fadePen ? "4" :""}}>
               <div className="input-group input-group-sm">
-                <em style={{ background: 'none', border: 'none' }} title={`To Page no. ${pdfHighLightedText.argIndex+1}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkage(e, pdfHighLightedText.linkingId,pdfHighLightedText.argIndex)}>
+                <em style={{ background: 'none', border: 'none' }} title={`To Page no. ${pdfHighLightedText.argIndex}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkage(e, pdfHighLightedText.linkingId,pdfHighLightedText.argIndex)}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"}  viewBox="0 0 16 16">
                     <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                   </svg>
-                <p className="badge badge-sm bg-success m-1">{pdfHighLightedText.argIndex+1}</p>
+                <p className="badge badge-sm bg-success m-1">{pdfHighLightedText.argIndex}</p>
                 </em>
                 <input onChange={(e) => e.stopPropagation()}  className="form-control form-control-sm text-white font-weight-bold text-capitalize" style={{ background: " rgb(254,166,154)" ,fontSize:"11px"}}/>
                 <em style={{ background: 'none', border: 'none' ,cursor:"pointer"}} className="fa-solid fa-paintbrush text-lg input-group-text" onClick={(e)=> handleChooseColor(e,index,'pdfTextCard')} ></em>
@@ -400,11 +400,11 @@ const handleRemoveEvents=(e)=>{
                 {pdfHighLightedText.text}
               <div className="d-flex justify-content-end fixed-bottom align-item-center">
                 <div className="input-group input-group-sm ">
-                  <em style={{ background: 'none', border: 'none' }} title={`To Page no. ${pdfHighLightedText.rightArgIndex?pdfHighLightedText.rightArgIndex+1:"No Link"}`} className="text-primary input-group-text"  onClick={(e)=> linkOrGotoAnnotatedpage(e, pdfHighLightedText.rightLinkId,pdfHighLightedText.linkingId,pdfHighLightedText.rightArgIndex)}>
+                  <em style={{ background: 'none', border: 'none' }} title={`To Page no. ${pdfHighLightedText.rightArgIndex}`} className="text-primary input-group-text"  onClick={(e)=> linkOrGotoAnnotatedpage(e, pdfHighLightedText.rightLinkId,pdfHighLightedText.linkingId,pdfHighLightedText.rightArgIndex)}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor="pointer" viewBox="0 0 16 16">
                     <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m-3.5 7.5a.5.5 0 0 1 0-1H10.293l-2.147-2.146a.5.5 0 0 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 1 1-.708-.708L10.293 8z" />
                   </svg>
-                  <p className="badge badge-sm bg-secondary m-1">{pdfHighLightedText.rightArgIndex?pdfHighLightedText.rightArgIndex+1:""}</p>
+                  <p className="badge badge-sm bg-secondary m-1">{pdfHighLightedText.rightArgIndex}</p>
                   </em>
                   <em onClick={(e)=> freeHandSketch(e, pdfHighLightedText.id,'pdfHighLightedText',index)} style={{ background: 'none', border: 'none', cursor:"pointer"}} className={`fa-solid fa-pen text-lg input-group-text  text-${pdfHighLightedText.fadePenColorFlag ? 'dark' : 'secondary' }`} ></em>
                 </div>
@@ -441,11 +441,11 @@ const handleRemoveEvents=(e)=>{
           <div className="card card-body rounded-3 p-1" style={{height:"100%", width:"95%", backgroundColor: `${ele.color}`}}>
           <div style={{zIndex: !fadePen ? "4" :""}}>
             <div className="input-group input-group-sm">
-                  <em style={{ background: 'none', border: 'none', cursor:"pointer"}} title={`To Page no. ${ele.pageIndex ? (ele.pageIndex+1) : "No Linkage"}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkageOfTextBox(e, ele.pageIndex)}>
+                  <em style={{ background: 'none', border: 'none', cursor:"pointer"}} title={`To Page no. ${ele.pageIndex}`} className="text-primary input-group-text" onClick={(e) =>goToAnnoPageLinkageOfTextBox(e, ele.pageIndex)}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" cursor={"pointer"}  viewBox="0 0 16 16">
                     <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                   </svg>
-                  <p className={`badge badge-sm ${ele.pageIndex ? 'bg-success':'bg-warning'} m-1`}>{ele.pageIndex ? (ele.pageIndex+1) :""}</p>
+                  <p className={`badge badge-sm bg-success m-1`}>{ele.pageIndex}</p>
                   </em>
                 <em style={{ background: 'none', border: 'none', cursor:"pointer"}} className="fa-solid fa-paintbrush text-lg input-group-text" onClick={(e)=> handleChooseColor(e,index,'textBoxCard')}></em>
             </div>               
