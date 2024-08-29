@@ -242,6 +242,7 @@ console.log('textboxes',textboxes)
     props.setFlagForTextbox(false);
     props.viewerIns.undo();
     setFadePen(false);
+    setFadeBoxBtn(false)
     setCanvaId(null);
   };
 
